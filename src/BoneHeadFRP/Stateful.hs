@@ -39,6 +39,9 @@ now :: Timer -> Behavior a -> IO a
 now timer b = do t <- getTime timer
                  at b t
 
+pureB :: (Time -> a) -> Behavior a
+pureB f = B $ return . f
+
 instance Functor Behavior where
   fmap = liftM
 
@@ -73,6 +76,9 @@ integrate n t0 (B f) = B $ \t -> if t <= t0 then return 0 else
 
 -- | An event stream.
 newtype Event a = E { occurrences :: IO [(Time, a)] }
+
+pureE :: [(Time, a)] -> Event a
+pureE xs = E $ return xs
 
 instance Functor Event where
   fmap f (E xs) = E $ fmap (fmap (\(t, x) -> (t, f x))) xs
