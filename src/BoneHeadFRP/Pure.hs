@@ -6,6 +6,7 @@
 module BoneHeadFRP.Pure where
 
 import Control.Monad (ap, liftM, join)
+import Control.Monad.Fix
 
 
 type Time = Double
@@ -24,6 +25,9 @@ instance Monad Behavior where
   return x = B $ \_ -> x
 
   (>>=) (B f) g = B $ \t -> at (g (f t)) t
+
+instance MonadFix Behavior where
+  mfix f = B $ \t -> let x = at (f x) t in x
 
 time :: Behavior Time
 time = B id

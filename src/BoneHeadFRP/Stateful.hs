@@ -7,6 +7,7 @@ module BoneHeadFRP.Stateful
   ) where
 
 import Control.Monad (ap, liftM, join)
+import Control.Monad.Fix
 import Data.IORef
 import Data.Time.Clock.System
 
@@ -54,6 +55,9 @@ instance Monad Behavior where
 
   (>>=) (B f) g = B $ \t -> do x <- f t
                                at (g x) t
+
+instance MonadFix Behavior where
+  mfix f = B $ \t -> mfix (\x -> at (f x) t)
 
 time :: Behavior Time
 time = B return
