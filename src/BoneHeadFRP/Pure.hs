@@ -28,6 +28,14 @@ instance Monad Behavior where
 time :: Behavior Time
 time = B id
 
+integrate :: Fractional a => Integer -> Time -> Behavior a -> Behavior a
+integrate n t0 (B f) = B $ \t -> if t <= t0 then 0 else
+  let delta = (t - t0)/(fromInteger n)
+      delta' = fromRational $ toRational delta
+      ts = [t0, (t0 + delta) .. t]
+  in
+    sum $ map (\t' -> delta' * (f t')) ts
+
 
 
 newtype Event a = E { occurrences :: [(Time, a)] }

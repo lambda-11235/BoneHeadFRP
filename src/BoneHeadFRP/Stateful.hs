@@ -55,6 +55,20 @@ instance Monad Behavior where
 time :: Behavior Time
 time = B return
 
+-- | Performs integration over some behavior using Riemann sums. The arguments
+-- are as follows: the number of samples to take, the start time, and the
+-- behavior to integrate over. All values before the start time default to 0.
+integrate :: Fractional a => Integer -> Time -> Behavior a -> Behavior a
+integrate n t0 (B f) = B $ \t -> if t <= t0 then return 0 else
+  let delta = (t - t0)/(fromInteger n)
+      delta' = fromRational $ toRational delta
+      ts = [t0, (t0 + delta) .. t]
+      area t' = do x <- f t'
+                   return (delta' * x)
+  in
+    do areas <- mapM area ts
+       return (sum areas)
+
 
 
 -- | An event stream.
