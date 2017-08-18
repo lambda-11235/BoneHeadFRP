@@ -17,7 +17,6 @@ type DTime = Time
 
 newtype Timer = Timer { startTime :: SystemTime }
 
--- TODO: Update to use modern time library.
 makeTimer :: IO Timer
 makeTimer = do st <- getSystemTime
                return (Timer st)
@@ -32,7 +31,7 @@ getTime (Timer t) = do t' <- getSystemTime
 
 
 -- | A time varying value. Note that `at` will return bogus values for future
--- times if the behavior depends on a `statful` event stream, as the future
+-- times if the behavior depends on a `stateful` event stream, as the future
 -- values have not been instantiated yet.
 newtype Behavior a = B { at :: Time -> IO a }
 
@@ -109,8 +108,8 @@ hold x (E xs) = B $ \t -> do xs' <- xs
     getLast t m [] = m
     getLast t m ((t', x) : xs) = if t' <= t then getLast t (Just x) xs else m
 
--- Acts as the first behavior until the first event occurrence. After the first
--- event the behavior is given by the most recent event.
+-- | Acts as the first behavior until the first event occurrence. After the
+-- first event the behavior is given by the most recent event.
 untilB :: Behavior a -> Event (Behavior a) -> Behavior a
 untilB b e = join (hold b e)
 
@@ -136,7 +135,8 @@ scanE f x (E xs) = E $ do xs' <- xs
 
 
 -- | Creates a stateful event stream and a function to send new events to the
--- stream. All stateful event stream in an FRP system should use the same timer.
+-- stream. All stateful event streams in an FRP system should use the same
+-- timer.
 stateful :: Timer -> IO (Event a, a -> IO ())
 stateful timer =
   do ref <- newIORef []
