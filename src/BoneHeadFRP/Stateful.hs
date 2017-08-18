@@ -1,7 +1,7 @@
 
 module BoneHeadFRP.Stateful
   ( Time, DTime, Timer, makeTimer, getTime
-  , Behavior, at, now, time
+  , Behavior, at, now, time, integrate
   , Event, occurrences, merge, with, hold, scanE, filterE
   , untilB, stateful
   ) where
